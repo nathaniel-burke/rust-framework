@@ -1,5 +1,5 @@
-use wasm_bindgen::prelude::*;
 use core_api::Runtime;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub struct WasmApp {
@@ -9,7 +9,9 @@ pub struct WasmApp {
 #[wasm_bindgen]
 pub fn init() -> WasmApp {
     console_error_panic_hook::set_once();
-    WasmApp { runtime: Runtime::new() }
+    WasmApp {
+        runtime: Runtime::new(),
+    }
 }
 
 #[wasm_bindgen]

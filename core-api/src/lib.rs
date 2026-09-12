@@ -52,7 +52,9 @@ pub mod systems {
 
     impl Scheduler {
         pub fn new() -> Self {
-            Self { systems: Vec::new() }
+            Self {
+                systems: Vec::new(),
+            }
         }
 
         pub fn add_system(&mut self, s: Box<dyn System>) {
@@ -81,7 +83,9 @@ pub mod services {
 
     impl ServiceRegistry {
         pub fn new() -> Self {
-            Self { map: HashMap::new() }
+            Self {
+                map: HashMap::new(),
+            }
         }
 
         pub fn insert<T: Any + Send + Sync>(&mut self, service: T) {
@@ -89,12 +93,14 @@ pub mod services {
         }
 
         pub fn get<T: Any + Send + Sync>(&self) -> Option<&T> {
-            self.map.get(&TypeId::of::<T>())
+            self.map
+                .get(&TypeId::of::<T>())
                 .and_then(|b| b.downcast_ref::<T>())
         }
 
         pub fn get_mut<T: Any + Send + Sync>(&mut self) -> Option<&mut T> {
-            self.map.get_mut(&TypeId::of::<T>())
+            self.map
+                .get_mut(&TypeId::of::<T>())
                 .and_then(|b| b.downcast_mut::<T>())
         }
     }
@@ -112,7 +118,9 @@ pub mod resources {
 
     impl AssetRegistry {
         pub fn new() -> Self {
-            Self { inner: HashMap::new() }
+            Self {
+                inner: HashMap::new(),
+            }
         }
 
         pub fn register(&mut self, key: impl Into<String>, info: impl Into<String>) {
@@ -140,14 +148,13 @@ pub mod events {
 
     impl EventBus {
         pub fn new() -> Self {
-            Self { subscribers: HashMap::new() }
+            Self {
+                subscribers: HashMap::new(),
+            }
         }
 
         pub fn subscribe(&mut self, topic: impl Into<String>, f: Subscriber) {
-            self.subscribers
-                .entry(topic.into())
-                .or_default()
-                .push(f);
+            self.subscribers.entry(topic.into()).or_default().push(f);
         }
 
         pub fn publish(&self, topic: &str, payload: &str) {
@@ -176,12 +183,12 @@ pub mod lifecycle {
 
 // ----------------------------- Runtime (no backwards compatibility) -----------------------------
 
-use time::Clock;
-use systems::Scheduler;
-use services::ServiceRegistry;
-use resources::AssetRegistry;
 use events::EventBus;
 use lifecycle::AppState;
+use resources::AssetRegistry;
+use services::ServiceRegistry;
+use systems::Scheduler;
+use time::Clock;
 
 /// Framework runtime. The runtime owns scheduling, services, resources and
 /// events. Platform integrations can be added without coupling the core to a
@@ -216,7 +223,8 @@ impl Runtime {
         }
 
         self.scheduler.update(&self.clock);
-        self.events.publish("frame/tick", &format!("{}", self.clock.ticks));
+        self.events
+            .publish("frame/tick", &format!("{}", self.clock.ticks));
     }
 
     pub fn clock(&self) -> &Clock {

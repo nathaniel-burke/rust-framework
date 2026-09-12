@@ -4,7 +4,7 @@ resolver = "2"
 members = [
     "core-api",
     "audio-cpal",
-    "renderer-wgpu",
+    "graphics-wgpu",
     "examples/demo-native",
     "examples/demo-web",
 ]
