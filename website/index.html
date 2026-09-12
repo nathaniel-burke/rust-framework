@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Engine demo web</title>
+</head>
+<body>
+  <h1>Engine demo (WASM)</h1>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <script type="module">
+    import * as wasm from './pkg/demo_web.js';
+    async function run() {
+      // wasm-pack output usually has a default export to initialize the module; this differs
+      // by build method. Adjust if your build produces different entry points.
+      if (wasm.default) await wasm.default();
+      const app = wasm.init();
+      setInterval(() => app.tick(), 200);
+    }
+    run();
+  </script>
+</body>
+</html>
