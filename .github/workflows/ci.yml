@@ -1,20 +1,23 @@
-name: CI
+name: Build and deploy
 
 on:
   push:
     branches: [ main ]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   build-native:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       - name: Build workspace
         run: cargo build --workspace --release
 
@@ -23,17 +26,14 @@ jobs:
     needs: build-native
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
+      - uses: dtolnay/rust-toolchain@stable
       - name: Install wasm-pack
         run: cargo install wasm-pack --locked
       - name: Add wasm target
         run: rustup target add wasm32-unknown-unknown
       - name: Build demo-web with wasm-pack
-        run: wasm-pack build demo-web --target web --out-dir website/pkg
+        working-directory: examples/demo-web
+        run: wasm-pack build --target web --out-dir ../../website/pkg
       - name: Upload website artifact
         uses: actions/upload-artifact@v4
         with:
@@ -44,6 +44,12 @@ jobs:
     needs: build-wasm
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - name: Download website artifact
@@ -51,8 +57,12 @@ jobs:
         with:
           name: website
           path: website
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: website
+          path: website
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

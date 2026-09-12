@@ -17,7 +17,7 @@ Quick start (Windows):
 - Install wasm-pack for web builds: cargo install wasm-pack --locked
 - Run native demo: cargo run -p demo-native
 - Check all crates: cargo check --workspace
-- Build web demo (produces website/pkg): wasm-pack build demo-web --target web --out-dir website/pkg
+- Build web demo (produces website/pkg): wasm-pack build examples/demo-web --target web --out-dir website/pkg
 
 Using the crates:
 
@@ -84,4 +84,7 @@ let graphics = pollster::block_on(graphics_wgpu::GraphicsContext::new(window))?;
 graphics.render_clear(graphics_wgpu::wgpu::Color::BLACK)?;
 ```
 
-CI: GitHub Actions workflow builds native + wasm and deploys website/ to GitHub Pages.
+CI: GitHub Actions builds the native workspace and the web demo. Pushes to
+`main` publish `website/` to GitHub Pages using the repository's Pages
+deployment environment. In the repository settings, set **Pages > Build and
+deployment > Source** to **GitHub Actions**.
