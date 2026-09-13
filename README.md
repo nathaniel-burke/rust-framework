@@ -19,6 +19,13 @@ Quick start (Windows):
 - Check all crates: cargo check --workspace
 - Build web demo (produces website/pkg): wasm-pack build examples/demo-web --target web --out-dir website/pkg
 
+Linux native builds need ALSA development files for `audio-cpal`:
+
+```bash
+sudo apt-get update
+sudo apt-get install --yes pkg-config libasound2-dev
+```
+
 Using the crates:
 
 Add only the parts your application needs. When using this repository as a
